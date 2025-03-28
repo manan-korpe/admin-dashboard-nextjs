@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useRouter } from "next/navigation";
 
+//ts interface start----------------------
 interface dataInterface {
   username: String;
   email: String;
@@ -20,9 +21,10 @@ interface errorInterface {
   isError: Boolean;
   errorMessage: String;
 }
+//ts interface end------------------------
 
 export default function SignIn() {
-  const router = useRouter();
+  const router = useRouter(); //navigation router
   const [data, setData] = useState<dataInterface>({
     username: "",
     email: "",
@@ -43,30 +45,29 @@ export default function SignIn() {
 
   async function formHandler(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (
-      !data.username ||
-      !data.password ||
-      //   !data.email ||
-      !data.confirmPassword
-    ) {
-      setError({ isError: true, errorMessage: "Enter valid Details" });
-      return 0;
-    }
-    if (data.password != data.confirmPassword) {
-      setError({
-        isError: true,
-        errorMessage: "Password and confirm Password is diffrent",
-      });
-      return 0;
-    }
-
-    // const form = new FormData(e.currentTarget);
-    // console.log(form);
     try {
-      const rawResponse = await Axios.post("/api/auth", data);
+      if (
+        !data.username ||
+        !data.password ||
+        !data.email ||
+        !data.confirmPassword
+      ) {
+        setError({ isError: true, errorMessage: "Enter valid Details" });
+        return 0;
+      }
+
+      //compare password and confirm password is same or not
+      if (data.password != data.confirmPassword) {
+        setError({
+          isError: true,
+          errorMessage: "Password and confirm Password is diffrent",
+        });
+        return 0;
+      }
+
+      await Axios.post("/api/auth/signin", data);
       router.push("/login");
     } catch (err: any) {
-      console.log(err);
       setError({
         isError: true,
         errorMessage: err.response.data.message,

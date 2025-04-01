@@ -7,6 +7,7 @@ interface usersInterface{
     isAdmin:Boolean,
     createAt:Date
 }
+
 const userSchema = new mongoose.Schema<usersInterface>({
     username:{
         type:String,
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema<usersInterface>({
         default:false
     },
     createAt:Date
-});
+},{ timestamps:true});
 
 const users = mongoose.models.users || mongoose.model<usersInterface>("users",userSchema);
 

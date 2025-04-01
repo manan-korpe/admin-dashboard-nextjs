@@ -1,46 +1,40 @@
+import dbConnection from "@/lib/dbConnection";
+import users from "@/models/users";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-// export default function Layout() {
-//   return (
-//     <main className="flex h-dvh">
-//       <aside className="w-1/5 h-100 bg-blue-800 relative overflow-hidden">
-//         <div className="fixed h-100 bg-blue-800 p-2">
-//         <div className="sticky top-0 h-full">
-//           <div className="py-4 text-center font-semibold text-3xl bg-blue-600 rounded first-letter:text-amber-400 first-letter:text-5xl border-b">
-//             Admin Dashboard
-//           </div>
-//           <ul className="mt-4  ms-1.5 -tracking-tight  ">
-//             <li className="my-5 p-3 bg-blue-700 hover:bg-blue-600 rounded flex items-center">
-//               <i className="fa-solid fa-house w-10"></i>
-//               <div>Dashboard</div>
-//             </li>
-//             <li className="my-5 p-3 bg-blue-700 hover:bg-blue-600 rounded ">
-//               <Link href={"dashboard/product"} className="flex items-center">
-//               <i className="fa-solid fa-bucket w-10"></i>
-//               <div>Product</div>
-//               </Link>
-//             </li>
-//           </ul>
-//           <div className="text-[1.2rem] bg-blue-700 hover:bg-blue-600 absolute flex items-center justify-between bottom-5 p-3 w-full rounded">
-//             <div>logout</div>
-//             <i className="fa-solid fa-right-from-bracket"></i>
-//           </div>
-//         </div>
-//         </div>
-//       </aside>
-//       <section className="w-4/5 h-full">
-//       <nav className="flex justify-end bg-blue-800 p-2.5">
-//           <div className="flex items-center gap-4 me-8">
-//             <img className="w-8 h-8 rounded-4xl border-2 border-amber-50" src="" alt=""/>
-//             <p className="tracking-wider text-[16px]">Name</p>
-//           </div>
-//         </nav>
-//       {children}</section>
-//     </main>
-//   );
-// }
+dbConnection();
+async function getUser(){
+  try {
+    const cookieStore =await cookies();
+    const adminCk = cookieStore.get("admin");
+    if(!adminCk?.value){
+      cookieStore.delete("admin");
+      redirect("/login");
+    }
+    const {id} = jwt.verify(adminCk.value,process.env.JWT_SECRETE_KEY);
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+    if(!id){
+      cookieStore.delete("admin");
+      redirect("/login");
+    }
+
+    const user = await users.findById(id);
+    if(!user){
+      cookieStore.delete("admin");
+      redirect("/login");
+    }
+    return user;
+  } catch (error) {
+    redirect("/");
+  }
+}
+
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const user = await getUser();
+
   return (
     <>
       <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
@@ -85,7 +79,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <div>
                   <button
                     type="button"
-                    className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                    className="flex items-center gap-3 text-sm pe-2 bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                     aria-expanded="false"
                     data-dropdown-toggle="dropdown-user"
                   >
@@ -95,6 +89,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
                       alt="user photo"
                     />
+                    <span className="text-[16px]">{user?.username}</span>
                   </button>
                 </div>
                 <div

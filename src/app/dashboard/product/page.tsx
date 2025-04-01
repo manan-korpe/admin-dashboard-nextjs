@@ -1,19 +1,30 @@
-export default function Product() {
+import AddProduct from "@/components/forms/addProduct";
+import UpdateProduct from "@/components/forms/UpdateProduct";
+import dbConnection from "@/lib/dbConnection";
+import categorys from "@/models/caregory"; //note is not import category then it will throw error
+import products from "@/models/product";
+
+dbConnection();
+export default async function Product() {
+  const product = await products.find().populate("category");
+  
   return (
     <>
-      <div className="p-3 bg-blue-800 m-3 rounded-xl">
+      <div className="flex items-center justify-between p-3 bg-blue-800 m-3 rounded-xl">
         <h5 className="tracking-widest">Product</h5>
+        <AddProduct/>
       </div>
       <div className="px-4">
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr className="text-[1rem]">
+                
                 <th scope="col" className="px-6 py-3">
                   Product name
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  Color
+                  Image
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Category
@@ -27,101 +38,28 @@ export default function Product() {
               </tr>
             </thead>
             <tbody>
-              <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200">
-                <th
-                  scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                >
-                  Apple MacBook Pro 17"
-                </th>
-                <td className="px-6 py-4">Silver</td>
-                <td className="px-6 py-4">Laptop</td>
-                <td className="px-6 py-4">$2999</td>
-                <td className="px-6 py-4">
-                  <a
-                    href="#"
-                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                  >
-                    Edit
-                  </a>
-                </td>
-              </tr>
-              <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200">
-                <th
-                  scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                >
-                  Microsoft Surface Pro
-                </th>
-                <td className="px-6 py-4">White</td>
-                <td className="px-6 py-4">Laptop PC</td>
-                <td className="px-6 py-4">$1999</td>
-                <td className="px-6 py-4">
-                  <a
-                    href="#"
-                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                  >
-                    Edit
-                  </a>
-                </td>
-              </tr>
-              <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200">
-                <th
-                  scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                >
-                  Magic Mouse 2
-                </th>
-                <td className="px-6 py-4">Black</td>
-                <td className="px-6 py-4">Accessories</td>
-                <td className="px-6 py-4">$99</td>
-                <td className="px-6 py-4">
-                  <a
-                    href="#"
-                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                  >
-                    Edit
-                  </a>
-                </td>
-              </tr>
-              <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200">
-                <th
-                  scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                >
-                  Google Pixel Phone
-                </th>
-                <td className="px-6 py-4">Gray</td>
-                <td className="px-6 py-4">Phone</td>
-                <td className="px-6 py-4">$799</td>
-                <td className="px-6 py-4">
-                  <a
-                    href="#"
-                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                  >
-                    Edit
-                  </a>
-                </td>
-              </tr>
-              <tr>
-                <th
-                  scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                >
-                  Apple Watch 5
-                </th>
-                <td className="px-6 py-4">Red</td>
-                <td className="px-6 py-4">Wearables</td>
-                <td className="px-6 py-4">$999</td>
-                <td className="px-6 py-4">
-                  <a
-                    href="#"
-                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                  >
-                    Edit
-                  </a>
-                </td>
-              </tr>
+              {product.length == 0 ? <h3>product not </h3> :product.map((value,index)=>(
+                 <tr key={index} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200">
+                 <th
+                   scope="row"
+                   className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                 >
+                   {value.name}
+                 </th>
+                 <td className="px-6 py-3">
+                 <div>
+                   
+                   <img data-tooltip-target="tooltip-jese" className="w-10 h-10 rounded-sm" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Medium avatar"/>
+                 </div>
+                 </td>
+                 <td className="px-6 py-3">{value.category.name}</td>
+                 <td className="px-6 py-3">${value.price}</td>
+                 <td className="px-6 py-3">
+                   <UpdateProduct id={value._id.toString()} name={value.name} category={value.category.name} price={value.price.toString()}/>
+                 </td>
+               </tr>
+              ))}
+             
             </tbody>
           </table>
         </div>

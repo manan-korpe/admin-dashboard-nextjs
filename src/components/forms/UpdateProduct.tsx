@@ -4,9 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface dataInterface {
-  username: string;
-  email: string;
-  password: string;
+  id?:String
+  name: string;
+  // image: String;
+  category: string;
+  price: string;
 }
 
 interface errorInterface {
@@ -14,17 +16,23 @@ interface errorInterface {
   errorMessage: String;
 }
 
-export default function UserForm() {
-  const route = useRouter();
+export default function UpdateProduct({
+  id,
+  name,
+  price,
+  category,
+}: dataInterface) {
+  const route = useRouter(); //refrach page after update product
   const [isHidden, setIsHidden] = useState<boolean>(true);
   const [error, setError] = useState<errorInterface>({
     isError: false,
     errorMessage: "",
   });
+
   const [data, setData] = useState<dataInterface>({
-    username: "",
-    email: "",
-    password: "",
+    name: name || "",
+    category: category || "",
+    price: price || "",
   });
 
   function setDataHandler(e: React.ChangeEvent<HTMLInputElement>) {
@@ -37,25 +45,29 @@ export default function UserForm() {
   async function submithandler(e: React.FormEvent<HTMLFormElement>) {
     try {
       e.preventDefault();
-      const tempData: dataInterface = data;
 
+      const tempData: dataInterface = data;
       if (
-        !tempData.username.trim() ||
-        !tempData.email.trim() ||
-        !tempData.password.trim()
+        !tempData.name.trim() ||
+        !tempData.category.trim() ||
+        !tempData.price.trim()
       ) {
         setError({ isError: true, errorMessage: "Enter valid Details" });
         return;
       }
 
-      const response = await axios.post("/api/auth/signin", tempData);
-      
+      const response = await axios.put(`/api/product?id=${id}`, {
+        ...tempData,
+        image: "temp",
+      });
+      console.log(response);
       route.refresh();
       setIsHidden(true);
     } catch (error: any) {
+      console.log(error)
       setError({
         isError: true,
-        errorMessage: error.response.data.message,
+        errorMessage: error.response?.data?.message || "not found",
       });
     }
   }
@@ -63,11 +75,11 @@ export default function UserForm() {
   return (
     <>
       <button
-        onClick={()=>setIsHidden(false)}
+        onClick={() => setIsHidden(false)}
         type="button"
-        className="bg-gray-700 px-3 p-1 rounded me-4 hover:bg-gray-600"
+        className="bg-blue-600 py-1 px-2 rounded hover:bg-blue-500 text-white"
       >
-        Add
+        update
       </button>
 
       <div className={isHidden ? "hidden" : ""}>
@@ -91,14 +103,14 @@ export default function UserForm() {
                 htmlFor="username"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                User Name
+                product name
               </label>
               <input
                 type="text"
-                id="username"
-                name="username"
+                id="name"
+                name="name"
                 className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
-                value={data.username}
+                value={data.name}
                 onChange={setDataHandler}
               />
             </div>
@@ -107,15 +119,15 @@ export default function UserForm() {
                 htmlFor="email"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Your email
+                category
               </label>
               <input
-                type="email"
-                id="email"
-                name="email"
+                type="text"
+                id="category"
+                name="category"
                 className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
                 onChange={setDataHandler}
-                value={data.email}
+                value={data.category}
               />
             </div>
             <div className="mb-5">
@@ -123,15 +135,15 @@ export default function UserForm() {
                 htmlFor="password"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Your password
+                price
               </label>
               <input
-                type="password"
-                id="password"
-                name="password"
+                type="text"
+                id="price"
+                name="price"
                 className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
                 onChange={setDataHandler}
-                value={data.password}
+                value={data.price}
               />
             </div>
             <div className="mb-5 text-red-600">
@@ -141,7 +153,7 @@ export default function UserForm() {
               type="submit"
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
-              Update Now
+              Add Now
             </button>
           </form>
         </div>

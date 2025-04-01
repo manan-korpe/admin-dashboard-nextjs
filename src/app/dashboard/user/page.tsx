@@ -1,7 +1,8 @@
 import UserForm from "@/components/forms/UserForm";
-import AddUSer from "@/components/forms/AddUser";
+import AddUser from "@/components/forms/AddUser";
 import dbConnection from "@/lib/dbConnection"; 
 import users from "@/models/users";
+import { Suspense } from "react";
 
 dbConnection();
 
@@ -10,9 +11,10 @@ export default async function User() {
     
     return (
       <>
+      <Suspense fallback="loding...">
         <div className="flex items-center justify-between p-3 bg-blue-800 m-3 rounded-xl ">
           <h5 className="tracking-widest ">User</h5>
-          <AddUSer/>
+          <AddUser/>
         </div>
         <div className="px-4">
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -63,8 +65,7 @@ export default async function User() {
             </table>
           </div>
         </div>
-
-        
+      </Suspense>
       </>
     );
   }
